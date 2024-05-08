@@ -12,10 +12,7 @@ const { baseURL, otherBaseURL } = getServiceBaseURL(import.meta.env, isHttpProxy
 
 export const request = createFlatRequest<App.Service.Response, RequestInstanceState>(
   {
-    baseURL,
-    headers: {
-      apifoxToken: 'XL299LiMEDZ0H5h3A29PxwQXdMJqWyY2'
-    }
+    baseURL
   },
   {
     async onRequest(config) {
@@ -49,14 +46,17 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
 
       // when the backend response code is in `logoutCodes`, it means the user will be logged out and redirected to login page
       const logoutCodes = import.meta.env.VITE_SERVICE_LOGOUT_CODES?.split(',') || [];
-      if (logoutCodes.includes(response.data.code)) {
+      if (logoutCodes.includes(String(response.data.code))) {
         handleLogout();
         return null;
       }
 
       // when the backend response code is in `modalLogoutCodes`, it means the user will be logged out by displaying a modal
       const modalLogoutCodes = import.meta.env.VITE_SERVICE_MODAL_LOGOUT_CODES?.split(',') || [];
-      if (modalLogoutCodes.includes(response.data.code) && !request.state.errMsgStack?.includes(response.data.msg)) {
+      if (
+        modalLogoutCodes.includes(String(response.data.code)) &&
+        !request.state.errMsgStack?.includes(response.data.msg)
+      ) {
         request.state.errMsgStack = [...(request.state.errMsgStack || []), response.data.msg];
 
         // prevent the user from refreshing the page
@@ -64,7 +64,7 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
 
         window.$dialog?.error({
           title: 'Error',
-          content: response.data.code,
+          content: String(response.data.code),
           positiveText: $t('common.confirm'),
           maskClosable: false,
           onPositiveClick() {
@@ -81,7 +81,7 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
       // when the backend response code is in `expiredTokenCodes`, it means the token is expired, and refresh token
       // the api `refreshToken` can not return error code in `expiredTokenCodes`, otherwise it will be a dead loop, should return `logoutCodes` or `modalLogoutCodes`
       const expiredTokenCodes = import.meta.env.VITE_SERVICE_EXPIRED_TOKEN_CODES?.split(',') || [];
-      if (expiredTokenCodes.includes(response.data.code) && !request.state.isRefreshingToken) {
+      if (expiredTokenCodes.includes(String(response.data.code)) && !request.state.isRefreshingToken) {
         request.state.isRefreshingToken = true;
 
         const refreshConfig = await handleRefreshToken(response.config);
@@ -107,7 +107,7 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
       // get backend error message and code
       if (error.code === BACKEND_ERROR_CODE) {
         message = error.response?.data?.msg || message;
-        backendErrorCode = error.response?.data?.code || '';
+        backendErrorCode = error.response?.data?.code.toString() || '';
       }
 
       // the error message is displayed in the modal

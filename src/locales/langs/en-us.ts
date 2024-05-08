@@ -177,19 +177,7 @@ const local: App.I18n.Schema = {
     exception: 'Exception',
     exception_403: '403',
     exception_404: '404',
-    exception_500: '500',
-    plugin: 'Plugin',
-    plugin_copy: 'Copy',
-    plugin_charts: 'Charts',
-    plugin_charts_echarts: 'ECharts',
-    plugin_editor: 'Editor',
-    plugin_editor_quill: 'Quill',
-    plugin_editor_markdown: 'Markdown',
-    plugin_icon: 'Icon',
-    plugin_map: 'Map',
-    plugin_print: 'Print',
-    plugin_swiper: 'Swiper',
-    plugin_video: 'Video'
+    exception_500: '500'
   },
   page: {
     login: {

@@ -177,19 +177,7 @@ const local: App.I18n.Schema = {
     exception: '异常页',
     exception_403: '403',
     exception_404: '404',
-    exception_500: '500',
-    plugin: '插件示例',
-    plugin_copy: '剪贴板',
-    plugin_charts: '图表',
-    plugin_charts_echarts: 'ECharts',
-    plugin_editor: '编辑器',
-    plugin_editor_quill: '富文本编辑器',
-    plugin_editor_markdown: 'MD 编辑器',
-    plugin_icon: '图标',
-    plugin_map: '地图',
-    plugin_print: '打印',
-    plugin_swiper: 'Swiper',
-    plugin_video: '视频'
+    exception_500: '500'
   },
   page: {
     login: {

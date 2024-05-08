@@ -52,13 +52,17 @@ declare namespace Api {
    */
   namespace Auth {
     interface LoginToken {
-      token: string;
-      refreshToken: string;
+      access_token: string;
+      refresh_token: string;
+    }
+
+    interface Basic {
+      userName: string;
+      userId: string;
     }
 
     interface UserInfo {
-      userId: string;
-      userName: string;
+      user: Auth.Basic;
       roles: string[];
       buttons: string[];
     }
