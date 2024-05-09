@@ -136,7 +136,7 @@ const localIconOptions = localIcons.map<SelectOption>(item => ({
 
 const showLayout = computed(() => model.parentId === 0);
 
-const showPage = computed(() => model.menuType === '2');
+const showPage = computed(() => model.menuType === '1');
 
 const pageOptions = computed(() => {
   const allPages = [...props.allPages];

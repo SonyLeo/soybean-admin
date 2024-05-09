@@ -1,6 +1,6 @@
 <script setup lang="tsx">
 import { NButton, NPopconfirm, NTag } from 'naive-ui';
-import { fetchGetUserList } from '@/service/api';
+import { fetchDelUser, fetchGetUserList } from '@/service/api';
 import { $t } from '@/locales';
 import { useAppStore } from '@/store/modules/app';
 import { enableStatusRecord, userGenderRecord } from '@/constants/business';
@@ -12,18 +12,20 @@ const appStore = useAppStore();
 
 const { columns, columnChecks, data, getData, loading, mobilePagination, searchParams, resetSearchParams } = useTable({
   apiFn: fetchGetUserList,
-  showTotal: true,
   apiParams: {
     current: 1,
     size: 10,
     // if you want to use the searchParams in Form, you need to define the following properties, and the value is null
     // the value can not be undefined, otherwise the property in Form will not be reactive
-    status: null,
+    deptId: null,
     userName: null,
-    userGender: null,
     nickName: null,
-    userPhone: null,
-    userEmail: null
+    userType: null,
+    email: null,
+    phonenumber: null,
+    sex: null,
+    avatar: null,
+    password: null
   },
   columns: () => [
     {
@@ -32,68 +34,79 @@ const { columns, columnChecks, data, getData, loading, mobilePagination, searchP
       width: 48
     },
     {
-      key: 'index',
-      title: $t('common.index'),
+      key: 'id',
+      title: '用户编号',
       align: 'center',
-      width: 64
+      minWidth: 50
+    },
+    {
+      key: 'deptId',
+      title: '所属部门',
+      align: 'center',
+      minWidth: 50,
+      render: (row: any) => {
+        const deptName = row.dept.deptName;
+
+        return deptName;
+      }
     },
     {
       key: 'userName',
-      title: $t('page.manage.user.userName'),
+      title: '名称',
       align: 'center',
-      minWidth: 100
+      minWidth: 50
     },
     {
-      key: 'userGender',
-      title: $t('page.manage.user.userGender'),
+      key: 'nickName',
+      title: '昵称',
       align: 'center',
-      width: 100,
+      minWidth: 50
+    },
+    {
+      key: 'email',
+      title: '邮箱',
+      align: 'center',
+      width: 250
+    },
+    {
+      key: 'phonenumber',
+      title: '手机号码',
+      align: 'center',
+      minWidth: 50
+    },
+    {
+      key: 'sex',
+      title: '性别',
+      align: 'center',
+      minWidth: 50,
       render: row => {
-        if (row.userGender === null) {
+        if (row.sex === null) {
           return null;
         }
 
         const tagMap: Record<Api.SystemManage.UserGender, NaiveUI.ThemeColor> = {
-          1: 'primary',
-          2: 'error'
+          0: 'primary',
+          1: 'error'
         };
 
-        const label = $t(userGenderRecord[row.userGender]);
+        const label = $t(userGenderRecord[row.sex]);
 
-        return <NTag type={tagMap[row.userGender]}>{label}</NTag>;
+        return <NTag type={tagMap[row.sex]}>{label}</NTag>;
       }
     },
     {
-      key: 'nickName',
-      title: $t('page.manage.user.nickName'),
-      align: 'center',
-      minWidth: 100
-    },
-    {
-      key: 'userPhone',
-      title: $t('page.manage.user.userPhone'),
-      align: 'center',
-      width: 120
-    },
-    {
-      key: 'userEmail',
-      title: $t('page.manage.user.userEmail'),
-      align: 'center',
-      minWidth: 200
-    },
-    {
       key: 'status',
-      title: $t('page.manage.user.userStatus'),
+      title: '帐号状态',
       align: 'center',
-      width: 100,
+      minWidth: 50,
       render: row => {
         if (row.status === null) {
           return null;
         }
 
         const tagMap: Record<Api.Common.EnableStatus, NaiveUI.ThemeColor> = {
-          1: 'success',
-          2: 'warning'
+          0: 'success',
+          1: 'warning'
         };
 
         const label = $t(enableStatusRecord[row.status]);
@@ -124,7 +137,8 @@ const { columns, columnChecks, data, getData, loading, mobilePagination, searchP
         </div>
       )
     }
-  ]
+  ],
+  showTotal: true
 });
 
 const {
@@ -140,20 +154,20 @@ const {
 } = useTableOperate(data, getData);
 
 async function handleBatchDelete() {
-  // request
-  console.log(checkedRowKeys.value);
+  if (checkedRowKeys.value.length > 0) {
+    await fetchDelUser(checkedRowKeys.value);
 
-  onBatchDeleted();
+    onBatchDeleted();
+  }
 }
 
-function handleDelete(id: number) {
-  // request
-  console.log(id);
+async function handleDelete(id: number) {
+  await fetchDelUser(id);
 
   onDeleted();
 }
 
-function edit(id: number) {
+async function edit(id: number) {
   handleEdit(id);
 }
 </script>
@@ -161,7 +175,7 @@ function edit(id: number) {
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <UserSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getData" />
-    <NCard :title="$t('page.manage.user.title')" :bordered="false" size="small" class="sm:flex-1-hidden card-wrapper">
+    <NCard title="用户信息列表" :bordered="false" size="small" class="sm:flex-1-hidden card-wrapper">
       <template #header-extra>
         <TableHeaderOperation
           v-model:columns="columnChecks"

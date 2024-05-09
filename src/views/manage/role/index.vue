@@ -61,8 +61,8 @@ const { columns, columnChecks, data, loading, getData, mobilePagination, searchP
         }
 
         const tagMap: Record<Api.Common.EnableStatus, NaiveUI.ThemeColor> = {
-          1: 'success',
-          2: 'warning'
+          0: 'success',
+          1: 'warning'
         };
 
         const label = $t(enableStatusRecord[row.status]);

@@ -38,8 +38,8 @@ const { columns, columnChecks, data, loading, pagination, getData } = useTable({
       width: 80,
       render: row => {
         const tagMap: Record<Api.Common.EnableStatus, NaiveUI.ThemeColor> = {
-          1: 'default',
-          2: 'primary'
+          0: 'default',
+          1: 'primary'
         };
 
         const label = $t(menuTypeRecord[row.menuType]);
@@ -100,8 +100,8 @@ const { columns, columnChecks, data, loading, pagination, getData } = useTable({
         }
 
         const tagMap: Record<Api.Common.EnableStatus, NaiveUI.ThemeColor> = {
-          1: 'success',
-          2: 'warning'
+          0: 'success',
+          1: 'warning'
         };
 
         const label = $t(enableStatusRecord[row.status]);

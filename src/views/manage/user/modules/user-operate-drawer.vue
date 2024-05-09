@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
-import { fetchGetAllRoles } from '@/service/api';
+import { fetchAddUser, fetchDeptTree, fetchUpdateUser } from '@/service/api';
 import { $t } from '@/locales';
 import { enableStatusOptions, userGenderOptions } from '@/constants/business';
 
@@ -13,7 +13,7 @@ interface Props {
   /** the type of operation */
   operateType: NaiveUI.TableOperateType;
   /** the edit row data */
-  rowData?: Api.SystemManage.User | null;
+  rowData?: Api.SystemManage.UserVO | null;
 }
 
 const props = defineProps<Props>();
@@ -33,28 +33,28 @@ const { defaultRequiredRule } = useFormRules();
 
 const title = computed(() => {
   const titles: Record<NaiveUI.TableOperateType, string> = {
-    add: $t('page.manage.user.addUser'),
-    edit: $t('page.manage.user.editUser')
+    add: '新增用户信息',
+    edit: '编辑用户信息'
   };
   return titles[props.operateType];
 });
 
-type Model = Pick<
-  Api.SystemManage.User,
-  'userName' | 'userGender' | 'nickName' | 'userPhone' | 'userEmail' | 'userRoles' | 'status'
->;
+type Model = Api.SystemManage.UserForm;
 
 const model: Model = reactive(createDefaultModel());
 
 function createDefaultModel(): Model {
   return {
+    deptId: null,
     userName: '',
-    userGender: null,
     nickName: '',
-    userPhone: '',
-    userEmail: '',
-    userRoles: [],
-    status: null
+    email: '',
+    phonenumber: '',
+    sex: null,
+    avatar: '',
+    password: '123456',
+    status: null,
+    remark: ''
   };
 }
 
@@ -65,56 +65,53 @@ const rules: Record<RuleKey, App.Global.FormRule> = {
   status: defaultRequiredRule
 };
 
-/** the enabled role options */
-const roleOptions = ref<CommonType.Option<string>[]>([]);
-
-async function getRoleOptions() {
-  const { error, data } = await fetchGetAllRoles();
-
-  if (!error) {
-    const options = data.map(item => ({
-      label: item.roleName,
-      value: item.roleCode
-    }));
-
-    // the mock data does not have the roleCode, so fill it
-    // if the real request, remove the following code
-    const userRoleOptions = model.userRoles.map(item => ({
-      label: item,
-      value: item
-    }));
-    // end
-
-    roleOptions.value = [...userRoleOptions, ...options];
+function handleUpdateModelWhenEdit() {
+  if (props.operateType === 'add') {
+    Object.assign(model, createDefaultModel());
+    return;
   }
-}
-
-function handleInitModel() {
-  Object.assign(model, createDefaultModel());
 
   if (props.operateType === 'edit' && props.rowData) {
     Object.assign(model, props.rowData);
   }
 }
 
-function closeDrawer() {
+async function closeDrawer() {
   visible.value = false;
 }
 
 async function handleSubmit() {
   await validate();
   // request
-  window.$message?.success($t('common.updateSuccess'));
-  closeDrawer();
+  if (!model.id) {
+    delete model.id;
+    fetchAddUser(model);
+    window.$message?.success($t('common.addSuccess'));
+  } else {
+    fetchUpdateUser(model);
+    window.$message?.success($t('common.updateSuccess'));
+  }
+
   emit('submitted');
+  closeDrawer();
+}
+
+const deptOptions = ref<Selection[]>([]);
+
+async function initDeptOtions() {
+  const { data } = await fetchDeptTree();
+  deptOptions.value = data;
 }
 
 watch(visible, () => {
   if (visible.value) {
-    handleInitModel();
+    handleUpdateModelWhenEdit();
     restoreValidation();
-    getRoleOptions();
   }
+});
+
+onMounted(() => {
+  initDeptOtions();
 });
 </script>
 
@@ -122,35 +119,44 @@ watch(visible, () => {
   <NDrawer v-model:show="visible" display-directive="show" :width="360">
     <NDrawerContent :title="title" :native-scrollbar="false" closable>
       <NForm ref="formRef" :model="model" :rules="rules">
-        <NFormItem :label="$t('page.manage.user.userName')" path="userName">
-          <NInput v-model:value="model.userName" :placeholder="$t('page.manage.user.form.userName')" />
+        <NFormItem label="所属部门" path="deptId" class="pr-24px">
+          <NTreeSelect v-model:value="model.deptId" placeholder="请选择部门" :options="deptOptions" clearable />
         </NFormItem>
-        <NFormItem :label="$t('page.manage.user.userGender')" path="userGender">
-          <NRadioGroup v-model:value="model.userGender">
-            <NRadio v-for="item in userGenderOptions" :key="item.value" :value="item.value" :label="$t(item.label)" />
-          </NRadioGroup>
+        <NFormItem label="用户账号" path="userName" class="pr-24px">
+          <NInput v-model:value="model.userName" placeholder="请输入用户账号" />
         </NFormItem>
-        <NFormItem :label="$t('page.manage.user.nickName')" path="nickName">
-          <NInput v-model:value="model.nickName" :placeholder="$t('page.manage.user.form.nickName')" />
+        <NFormItem v-if="$props.operateType === 'add'" label="用户密码" path="password" class="pr-24px">
+          <NInput v-model:value="model.password" type="password" placeholder="请输入用户密码" />
         </NFormItem>
-        <NFormItem :label="$t('page.manage.user.userPhone')" path="userPhone">
-          <NInput v-model:value="model.userPhone" :placeholder="$t('page.manage.user.form.userPhone')" />
+        <NFormItem label="用户昵称" path="nickName" class="pr-24px">
+          <NInput v-model:value="model.nickName" placeholder="请输入用户昵称" />
         </NFormItem>
-        <NFormItem :label="$t('page.manage.user.userEmail')" path="email">
-          <NInput v-model:value="model.userEmail" :placeholder="$t('page.manage.user.form.userEmail')" />
+        <NFormItem label="用户邮箱" path="email" class="pr-24px">
+          <NInput v-model:value="model.email" placeholder="请输入用户邮箱" />
         </NFormItem>
-        <NFormItem :label="$t('page.manage.user.userStatus')" path="status">
-          <NRadioGroup v-model:value="model.status">
-            <NRadio v-for="item in enableStatusOptions" :key="item.value" :value="item.value" :label="$t(item.label)" />
-          </NRadioGroup>
+        <NFormItem label="手机号码" path="phonenumber" class="pr-24px">
+          <NInput v-model:value="model.phonenumber" placeholder="请输入手机号码" />
         </NFormItem>
-        <NFormItem :label="$t('page.manage.user.userRole')" path="roles">
+        <NFormItem label="用户性别" path="sex" class="pr-24px">
           <NSelect
-            v-model:value="model.userRoles"
-            multiple
-            :options="roleOptions"
-            :placeholder="$t('page.manage.user.form.userRole')"
+            v-model:value="model.sex"
+            placeholder="请选择用户性别"
+            :options="userGenderOptions"
+            clearable
+            :render-label="(option: any) => $t(option.label)"
           />
+        </NFormItem>
+        <NFormItem label="帐号状态" path="status" class="pr-24px">
+          <NSelect
+            v-model:value="model.status"
+            placeholder="请选择帐号状态"
+            :options="enableStatusOptions"
+            clearable
+            :render-label="(option: any) => $t(option.label)"
+          />
+        </NFormItem>
+        <NFormItem label="备注" path="remark" class="pr-24px">
+          <NInput v-model:value="model.remark" placeholder="请输入备注" />
         </NFormItem>
       </NForm>
       <template #footer>

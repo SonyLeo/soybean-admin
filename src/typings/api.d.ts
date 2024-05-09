@@ -23,10 +23,10 @@ declare namespace Api {
     /**
      * enable status
      *
-     * - "1": enabled
-     * - "2": disabled
+     * - "0": enabled
+     * - "1": disabled
      */
-    type EnableStatus = '1' | '2';
+    type EnableStatus = '0' | '1';
 
     /** common record */
     type CommonRecord<T = any> = {
@@ -118,43 +118,92 @@ declare namespace Api {
     /**
      * user gender
      *
-     * - "1": "male"
-     * - "2": "female"
+     * - "0": "male"
+     * - "1": "female"
      */
-    type UserGender = '1' | '2';
+    type UserGender = '0' | '1';
 
     /** user */
-    type User = Common.CommonRecord<{
-      /** user name */
+    type UserVO = Common.CommonRecord<{
+      /** 用户ID */
+      userId: string;
+
+      /** 部门ID */
+      deptId: string;
+
+      /** 用户账号 */
       userName: string;
-      /** user gender */
-      userGender: UserGender | null;
-      /** user nick name */
+
+      /** 用户昵称 */
       nickName: string;
-      /** user phone */
-      userPhone: string;
-      /** user email */
-      userEmail: string;
-      /** user role code collection */
-      userRoles: string[];
+
+      /** 用户类型（sys_user系统用户） */
+      userType: string;
+
+      /** 用户邮箱 */
+      email: string;
+
+      /** 手机号码 */
+      phonenumber: string;
+
+      /** 用户性别（0男 1女 2未知） */
+      sex: UserGender | null;
+
+      /** 头像地址 */
+      avatar: string;
+
+      /** 密码 */
+      password: string;
+
+      /** 最后登录IP */
+      loginIp: string;
+
+      /** 最后登录时间 */
+      loginDate: number | [number, number];
+
+      /** 备注 */
+      remark: string;
     }>;
 
     /** user search params */
     type UserSearchParams = CommonType.RecordNullable<
-      Pick<Api.SystemManage.User, 'userName' | 'userGender' | 'nickName' | 'userPhone' | 'userEmail' | 'status'> &
+      Pick<
+        Api.SystemManage.UserVO,
+        'deptId' | 'userName' | 'nickName' | 'userType' | 'email' | 'phonenumber' | 'sex' | 'avatar' | 'password'
+      > &
+        CommonSearchParams
+    >;
+
+    /** user add/edit form */
+    type UserForm = CommonType.RecordNullable<
+      Pick<
+        Api.SystemManage.UserVO,
+        | 'id'
+        | 'deptId'
+        | 'userName'
+        | 'nickName'
+        | 'userType'
+        | 'email'
+        | 'phonenumber'
+        | 'sex'
+        | 'avatar'
+        | 'password'
+        | 'status'
+        | 'remark'
+      > &
         CommonSearchParams
     >;
 
     /** user list */
-    type UserList = Common.PaginatingQueryRecord<User>;
+    type UserList = Common.PaginatingQueryRecord<UserVO>;
 
     /**
      * menu type
      *
-     * - "1": directory
-     * - "2": menu
+     * - "0": directory
+     * - "1": menu
      */
-    type MenuType = '1' | '2';
+    type MenuType = '0' | '1';
 
     type MenuButton = {
       /**

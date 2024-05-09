@@ -24,11 +24,61 @@ export function fetchGetAllRoles() {
 /** get user list */
 export function fetchGetUserList(params?: Api.SystemManage.UserSearchParams) {
   return request<Api.SystemManage.UserList>({
-    url: '/systemManage/getUserList',
+    url: '/system/user/list',
     method: 'get',
     params
   });
 }
+
+/**
+ * 删除用户信息
+ *
+ * @param userId
+ */
+export const fetchDelUser = (userId: string | number | Array<string | number>) => {
+  return request({
+    url: `/system/user/${userId}`,
+    method: 'delete'
+  });
+};
+
+/**
+ * 新增用户信息
+ *
+ * @param data
+ */
+export const fetchAddUser = (data: Api.SystemManage.UserForm) => {
+  return request({
+    url: '/system/user',
+    method: 'post',
+    data
+  });
+};
+
+/**
+ * 修改用户信息
+ *
+ * @param data
+ */
+export const fetchUpdateUser = (data: Api.SystemManage.UserForm) => {
+  return request({
+    url: '/system/user',
+    method: 'put',
+    data
+  });
+};
+
+/**
+ * 获取用户部门
+ *
+ * @param data
+ */
+export const fetchDeptTree = () => {
+  return request({
+    url: '/system/user/deptTree',
+    method: 'get'
+  });
+};
 
 /** get menu list */
 export function fetchGetMenuList() {
