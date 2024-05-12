@@ -32,6 +32,8 @@ const local: App.I18n.Schema = {
     refresh: '刷新',
     reset: '重置',
     search: '搜索',
+    submit: '提交',
+    back: '返回',
     switch: '切换',
     tip: '提示',
     trigger: '触发',
@@ -177,7 +179,10 @@ const local: App.I18n.Schema = {
     exception: '异常页',
     exception_403: '403',
     exception_404: '404',
-    exception_500: '500'
+    exception_500: '500',
+    tool: '系统工具',
+    tool_generate: '代码生成',
+    'tool_generate-edit': '配置页'
   },
   page: {
     login: {

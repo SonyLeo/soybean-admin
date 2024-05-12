@@ -212,7 +212,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'manage',
       i18nKey: 'route.manage',
       icon: 'carbon:cloud-service-management',
-      order: 9,
+      order: 9
     },
     children: [
       {
@@ -246,8 +246,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'manage_user',
           i18nKey: 'route.manage_user',
           icon: 'ic:round-manage-accounts',
-          order: 1,
-
+          order: 1
         }
       },
       {
@@ -323,6 +322,41 @@ export const generatedRoutes: GeneratedRoute[] = [
             ]
           }
         ]
+      }
+    ]
+  },
+  {
+    name: 'tool',
+    path: '/tool',
+    component: 'layout.base',
+    meta: {
+      title: 'tool',
+      i18nKey: 'route.tool',
+      icon: 'fluent:window-dev-tools-24-regular',
+      order: 9
+    },
+    children: [
+      {
+        name: 'tool_generate',
+        path: '/tool/generate',
+        component: 'view.tool_generate',
+        meta: {
+          title: 'tool_generate',
+          i18nKey: 'route.tool_generate',
+          icon: 'mingcute:code-fill'
+        }
+      },
+      {
+        name: 'tool_generate-edit',
+        path: '/tool/generate-edit/:id',
+        component: 'view.tool_generate-edit',
+        props: true,
+        meta: {
+          title: 'tool_generate-edit',
+          i18nKey: 'route.tool_generate-edit',
+          hideInMenu: true,
+          activeMenu: 'tool_generate'
+        }
       }
     ]
   },

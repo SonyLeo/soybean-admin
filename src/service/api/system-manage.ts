@@ -80,6 +80,23 @@ export const fetchDeptTree = () => {
   });
 };
 
+/** 获取代码生成列表 */
+export const fetchGenTableList = (data: Api.SystemManage.GenTableForm) => {
+  return request<Api.SystemManage.GenTableList>({
+    url: '/tool/gen/list',
+    method: 'get',
+    data
+  });
+};
+
+// 查询表详细信息
+export const fetchGetGenTable = (tableId: string | number) => {
+  return request<Api.SystemManage.GenTableInfo>({
+    url: `/tool/gen/${tableId}`,
+    method: 'get'
+  });
+};
+
 /** get menu list */
 export function fetchGetMenuList() {
   return request<Api.SystemManage.MenuList>({

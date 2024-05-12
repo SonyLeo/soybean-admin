@@ -282,6 +282,8 @@ declare namespace App {
         refresh: string;
         reset: string;
         search: string;
+        submit: string;
+        back: string;
         switch: string;
         tip: string;
         trigger: string;

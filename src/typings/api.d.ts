@@ -43,6 +43,17 @@ declare namespace Api {
       /** record status */
       status: EnableStatus | null;
     } & T;
+
+    /**
+     * user gender
+     *
+     * - "0": "male"
+     * - "1": "female"
+     */
+    type UserGender = '0' | '1';
+
+    /** datepicker */
+    type Value = number | [number, number];
   }
 
   /**
@@ -86,45 +97,9 @@ declare namespace Api {
     }
   }
 
-  /**
-   * namespace SystemManage
-   *
-   * backend api module: "systemManage"
-   */
-  namespace SystemManage {
-    type CommonSearchParams = Pick<Common.PaginatingCommonParams, 'current' | 'size'>;
-
-    /** role */
-    type Role = Common.CommonRecord<{
-      /** role name */
-      roleName: string;
-      /** role code */
-      roleCode: string;
-      /** role description */
-      roleDesc: string;
-    }>;
-
-    /** role search params */
-    type RoleSearchParams = CommonType.RecordNullable<
-      Pick<Api.SystemManage.Role, 'roleName' | 'roleCode' | 'status'> & CommonSearchParams
-    >;
-
-    /** role list */
-    type RoleList = Common.PaginatingQueryRecord<Role>;
-
-    /** all role */
-    type AllRole = Pick<Role, 'id' | 'roleName' | 'roleCode'>;
-
-    /**
-     * user gender
-     *
-     * - "0": "male"
-     * - "1": "female"
-     */
-    type UserGender = '0' | '1';
-
+  namespace BackVO {
     /** user */
-    type UserVO = Common.CommonRecord<{
+    type User = Common.CommonRecord<{
       /** 用户ID */
       userId: string;
 
@@ -147,7 +122,7 @@ declare namespace Api {
       phonenumber: string;
 
       /** 用户性别（0男 1女 2未知） */
-      sex: UserGender | null;
+      sex: Common.UserGender | null;
 
       /** 头像地址 */
       avatar: string;
@@ -165,10 +140,136 @@ declare namespace Api {
       remark: string;
     }>;
 
+    /** genTable */
+    type GenTable = Common.CommonRecord<{
+      createDept: number;
+      tableId: string;
+      dataName: string;
+      tableName: string;
+      tableComment: string;
+      subTableName: any;
+      subTableFkName: any;
+      className: string;
+      tplCategory: string;
+      packageName: string;
+      moduleName: string;
+      businessName: string;
+      functionName: string;
+      functionAuthor: string;
+      genType: string;
+      genPath: string;
+      pkColumn: any;
+      columns: DbColumn[];
+      remark: any;
+      treeCode: any;
+      treeParentCode: any;
+      treeName: any;
+      menuIds: any;
+      parentMenuId: any;
+      parentMenuName: any;
+      tree: boolean;
+      crud: boolean;
+      dateRange: Common.Value | null;
+    }>;
+
+    /** DbColumn */
+    type DbColumn = Common.CommonRecord<{
+      createDept?: any;
+      columnId?: any;
+      tableId?: any;
+      columnName?: any;
+      columnComment?: any;
+      columnType?: any;
+      javaType?: any;
+      javaField?: any;
+      isPk?: any;
+      isIncrement?: any;
+      isRequired?: any;
+      isInsert?: any;
+      isEdit?: any;
+      isList?: any;
+      isQuery?: any;
+      queryType?: any;
+      htmlType?: any;
+      dictType?: any;
+      sort?: any;
+      increment: boolean;
+      capJavaField?: any;
+      usableColumn: boolean;
+      superColumn: boolean;
+      list: boolean;
+      pk: boolean;
+      insert: boolean;
+      edit: boolean;
+      query: boolean;
+      required: boolean;
+    }>;
+
+    /** DbTable */
+    type DbTable = Common.CommonRecord<{
+      createDept?: any;
+      tableId?: any;
+      tableName: string;
+      tableComment: string;
+      subTableName?: any;
+      subTableFkName?: any;
+      className?: any;
+      tplCategory?: any;
+      packageName?: any;
+      moduleName?: any;
+      businessName?: any;
+      functionName?: any;
+      functionAuthor?: any;
+      genType?: any;
+      genPath?: any;
+      pkColumn?: any;
+      columns: DbColumn[];
+      options?: any;
+      remark?: any;
+      treeCode?: any;
+      treeParentCode?: any;
+      treeName?: any;
+      menuIds?: any;
+      parentMenuId?: any;
+      parentMenuName?: any;
+      tree: boolean;
+      crud: boolean;
+    }>;
+  }
+
+  /**
+   * namespace SystemManage
+   *
+   * backend api module: "systemManage"
+   */
+  namespace SystemManage {
+    type CommonSearchParams = Pick<Common.PaginatingCommonParams, 'current' | 'size'>;
+
+    /** role */
+    type Role = Common.CommonRecord<{
+      /** role name */
+      roleName: string;
+      /** role code */
+      roleCode: string;
+      /** role description */
+      roleDesc: string;
+    }>;
+
+    /** role search params */
+    type RoleSearchParams = CommonType.RecordNullable<
+      Pick<SystemManage.Role, 'roleName' | 'roleCode' | 'status'> & CommonSearchParams
+    >;
+
+    /** role list */
+    type RoleList = Common.PaginatingQueryRecord<Role>;
+
+    /** all role */
+    type AllRole = Pick<Role, 'id' | 'roleName' | 'roleCode'>;
+
     /** user search params */
     type UserSearchParams = CommonType.RecordNullable<
       Pick<
-        Api.SystemManage.UserVO,
+        BackVO.User,
         'deptId' | 'userName' | 'nickName' | 'userType' | 'email' | 'phonenumber' | 'sex' | 'avatar' | 'password'
       > &
         CommonSearchParams
@@ -177,7 +278,7 @@ declare namespace Api {
     /** user add/edit form */
     type UserForm = CommonType.RecordNullable<
       Pick<
-        Api.SystemManage.UserVO,
+        BackVO.User,
         | 'id'
         | 'deptId'
         | 'userName'
@@ -195,7 +296,21 @@ declare namespace Api {
     >;
 
     /** user list */
-    type UserList = Common.PaginatingQueryRecord<UserVO>;
+    type UserList = Common.PaginatingQueryRecord<BackVO.User>;
+
+    /** genTable add/edit form */
+    type GenTableForm = CommonType.RecordNullable<
+      Pick<BackVO.GenTable, 'dataName' | 'tableName' | 'tableComment' | 'dateRange'> & CommonSearchParams
+    >;
+
+    /** genTable list */
+    type GenTableList = Common.PaginatingQueryRecord<BackVO.GenTable>;
+
+    type GenTableInfo = {
+      info: BackVO.GenTable;
+      rows: BackVO.DbColumn[];
+      tables: BackVO.GenTable[];
+    };
 
     /**
      * menu type

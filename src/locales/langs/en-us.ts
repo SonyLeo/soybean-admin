@@ -32,6 +32,8 @@ const local: App.I18n.Schema = {
     refresh: 'Refresh',
     reset: 'Reset',
     search: 'Search',
+    submit: 'Submit',
+    back: 'Back',
     switch: 'Switch',
     tip: 'Tip',
     trigger: 'Trigger',
@@ -177,7 +179,10 @@ const local: App.I18n.Schema = {
     exception: 'Exception',
     exception_403: '403',
     exception_404: '404',
-    exception_500: '500'
+    exception_500: '500',
+    tool: 'System Tool',
+    tool_generate: 'Generate Code',
+    'tool_generate-edit': 'Generate Code Config'
   },
   page: {
     login: {
