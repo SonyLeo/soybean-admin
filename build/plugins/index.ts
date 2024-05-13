@@ -6,6 +6,7 @@ import progress from 'vite-plugin-progress';
 import { setupElegantRouter } from './router';
 import { setupUnocss } from './unocss';
 import { setupUnplugin } from './unplugin';
+import { setupPrismjs } from './prismjs';
 
 export function setupVitePlugins(viteEnv: Env.ImportMeta) {
   const plugins: PluginOption = [
@@ -19,6 +20,7 @@ export function setupVitePlugins(viteEnv: Env.ImportMeta) {
     setupElegantRouter(),
     setupUnocss(viteEnv),
     ...setupUnplugin(viteEnv),
+    setupPrismjs(),
     progress()
   ];
 

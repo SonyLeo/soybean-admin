@@ -1,11 +1,14 @@
 <script setup lang="tsx">
 import { NButton, NPopconfirm } from 'naive-ui';
 import { useRouter } from 'vue-router';
-import { fetchDelUser, fetchGenTableList } from '@/service/api';
+import { ref } from 'vue';
+import { isNull } from 'lodash-es';
+import { fetchDelUser, fetchGenCode, fetchGenTableList } from '@/service/api';
 import { $t } from '@/locales';
 import { useAppStore } from '@/store/modules/app';
 import { useTable, useTableOperate } from '@/hooks/common/table';
 import TableSearch from './module/table-search.vue';
+import TablePreview from './module/table-preview.vue';
 
 const appStore = useAppStore();
 const router = useRouter();
@@ -124,8 +127,23 @@ async function edit(id: number) {
   router.push({ name: 'tool_generate-edit', params: { id } });
 }
 
+const genCodeList = ref<Record<string, string>>({});
+
+async function getGenCodeById(id: number) {
+  const { data: codeList } = await fetchGenCode(id);
+  if (!isNull(codeList)) {
+    genCodeList.value = codeList;
+  }
+}
+
+const isShowRef = ref<boolean>(false);
 function preview(id: number) {
-  console.log(id);
+  getGenCodeById(id);
+  isShowRef.value = true;
+}
+
+function handleUpdateVisible(visible: boolean) {
+  isShowRef.value = visible;
 }
 </script>
 
@@ -173,6 +191,7 @@ function preview(id: number) {
         class="sm:h-full"
       />
     </NCard>
+    <TablePreview :is-show="isShowRef" :gen-code-list="genCodeList" @update-visible="handleUpdateVisible" />
   </div>
 </template>
 

@@ -89,10 +89,18 @@ export const fetchGenTableList = (data: Api.SystemManage.GenTableForm) => {
   });
 };
 
-// 查询表详细信息
+/* 查询表详细信息 */
 export const fetchGetGenTable = (tableId: string | number) => {
   return request<Api.SystemManage.GenTableInfo>({
     url: `/tool/gen/${tableId}`,
+    method: 'get'
+  });
+};
+
+/** 预览代码生成信息 */
+export const fetchGenCode = (tableId: string | number) => {
+  return request<Record<string, string>>({
+    url: `/tool/gen/preview/${tableId}`,
     method: 'get'
   });
 };

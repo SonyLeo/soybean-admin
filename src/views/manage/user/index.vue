@@ -84,7 +84,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination, searchP
           return null;
         }
 
-        const tagMap: Record<Api.SystemManage.UserGender, NaiveUI.ThemeColor> = {
+        const tagMap: Record<Api.Common.UserGender, NaiveUI.ThemeColor> = {
           0: 'primary',
           1: 'error'
         };
