@@ -1,41 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { ref } from 'vue';
 import Prism from 'prismjs';
 
 interface Props {
-  isShow: boolean;
   genCodeList: Record<string, string>;
 }
 
-interface Emits {
-  (e: 'updateVisible', visible: boolean): void;
-}
-
 defineOptions({ name: 'TablePreview' });
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
+defineProps<Props>();
 
+const showModel = defineModel({ type: Boolean });
 const activeName = ref<string>('domain.java');
-const show = ref<boolean>(false);
-
-const bodyStyle = {
-  width: '1200px'
-};
-
-watch(
-  () => show.value,
-  value => {
-    emit('updateVisible', value);
-  }
-);
-
-watch(
-  () => props.isShow,
-  value => {
-    show.value = value;
-    emit('updateVisible', value);
-  }
-);
 
 function handleTabUpdate() {
   setTimeout(() => {
@@ -43,24 +18,32 @@ function handleTabUpdate() {
   }, 200);
 }
 
-onMounted(() => {
-  setTimeout(() => {
-    Prism.highlightAll();
-  }, 1500);
-});
+function handleEnter() {
+  handleTabUpdate();
+}
 </script>
 
 <template>
   <div>
-    <NModal v-model:show="show" preset="card" :style="bodyStyle" title="代码预览" size="huge" :bordered="false">
-      <NTabs :default-value="activeName" @update:value="handleTabUpdate">
+    <NModal
+      v-model:show="showModel"
+      preset="card"
+      class="w-1200px"
+      title="代码预览"
+      size="huge"
+      :bordered="false"
+      :on-after-enter="handleEnter"
+    >
+      <NTabs :default-value="activeName" type="card" animated @update:value="handleTabUpdate">
         <NTabPane
           v-for="(value, key) in genCodeList"
           :key="value"
           :name="key.substring(key.lastIndexOf('/') + 1, key.indexOf('.vm'))"
           :tab="key.substring(key.lastIndexOf('/') + 1, key.indexOf('.vm'))"
         >
-          <pre><code class="line-numbers language-sql">{{ value }}</code></pre>
+          <NScrollbar class="max-h-150" trigger="hover">
+            <pre><code class="line-numbers language-javascript match-braces">{{ value }}</code></pre>
+          </NScrollbar>
         </NTabPane>
       </NTabs>
     </NModal>

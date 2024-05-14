@@ -85,6 +85,7 @@ async function handleAccountLogin(account: Account) {
         type="password"
         show-password-on="click"
         :placeholder="$t('page.login.common.passwordPlaceholder')"
+        @keyup.enter="handleSubmit"
       />
     </NFormItem>
     <NSpace vertical :size="24">

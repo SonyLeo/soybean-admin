@@ -136,14 +136,10 @@ async function getGenCodeById(id: number) {
   }
 }
 
-const isShowRef = ref<boolean>(false);
+const showModel = ref<boolean>(false);
 function preview(id: number) {
+  showModel.value = true;
   getGenCodeById(id);
-  isShowRef.value = true;
-}
-
-function handleUpdateVisible(visible: boolean) {
-  isShowRef.value = visible;
 }
 </script>
 
@@ -191,7 +187,7 @@ function handleUpdateVisible(visible: boolean) {
         class="sm:h-full"
       />
     </NCard>
-    <TablePreview :is-show="isShowRef" :gen-code-list="genCodeList" @update-visible="handleUpdateVisible" />
+    <TablePreview v-model="showModel" :gen-code-list="genCodeList" />
   </div>
 </template>
 
