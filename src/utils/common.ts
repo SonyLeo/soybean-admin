@@ -71,20 +71,22 @@ export const addDateRange = (params?: any, dateRange?: Api.Common.Value | null, 
   search.params =
     typeof search.params === 'object' && search.params !== null && !Array.isArray(search.params) ? search.params : {};
 
-  const [startDate, endDate] = dateRange!.map(date => dayjs(new Date(date)).format('YYYY-MM-DD')); // Convert date strings to Date objects
+  if (dateRange) {
+    const [startDate, endDate] = dateRange.map(date => dayjs(new Date(date)).format('YYYY-MM-DD')); // Convert date strings to Date objects
 
-  if (typeof propName === 'undefined') {
-    search.params.beginTime = startDate;
-    search.params.endTime = endDate;
-  } else {
-    search.params[`begin${propName}`] = startDate;
-    search.params[`end${propName}`] = endDate;
+    if (typeof propName === 'undefined') {
+      search.params.beginTime = startDate;
+      search.params.endTime = endDate;
+    } else {
+      search.params[`begin${propName}`] = startDate;
+      search.params[`end${propName}`] = endDate;
+    }
   }
 
   delete search.dateRange;
 
-  // 去掉值为""的对象属性
-  search = Object.fromEntries(Object.entries(search).filter(([_, value]) => value !== ''));
+  // 去掉值为 null 的对象属性
+  search = Object.fromEntries(Object.entries(search).filter(([_, value]) => value !== null));
 
   return search;
 };
