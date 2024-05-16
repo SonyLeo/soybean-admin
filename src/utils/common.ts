@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { $t } from '@/locales';
 
 /**
@@ -56,3 +57,34 @@ export function toggleHtmlClass(className: string) {
     remove
   };
 }
+
+/**
+ * Add date range to search parameters
+ *
+ * @param params - The search parameters object
+ * @param dateRange - An array containing the start and end dates of the range
+ * @param propName - Optional property name prefix for the date range
+ * @returns The updated search parameters object
+ */
+export const addDateRange = (params?: any, dateRange?: Api.Common.Value | null, propName?: string) => {
+  let search = { ...params }; // Make a shallow copy of the params
+  search.params =
+    typeof search.params === 'object' && search.params !== null && !Array.isArray(search.params) ? search.params : {};
+
+  const [startDate, endDate] = dateRange!.map(date => dayjs(new Date(date)).format('YYYY-MM-DD')); // Convert date strings to Date objects
+
+  if (typeof propName === 'undefined') {
+    search.params.beginTime = startDate;
+    search.params.endTime = endDate;
+  } else {
+    search.params[`begin${propName}`] = startDate;
+    search.params[`end${propName}`] = endDate;
+  }
+
+  delete search.dateRange;
+
+  // 去掉值为""的对象属性
+  search = Object.fromEntries(Object.entries(search).filter(([_, value]) => value !== ''));
+
+  return search;
+};

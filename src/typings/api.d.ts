@@ -53,7 +53,7 @@ declare namespace Api {
     type UserGender = '0' | '1';
 
     /** datepicker */
-    type Value = number | [number, number];
+    type Value = [number, number];
 
     /**
      * 生成方式

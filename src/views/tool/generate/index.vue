@@ -14,6 +14,7 @@ import {
 import { $t } from '@/locales';
 import { useAppStore } from '@/store/modules/app';
 import { useTable, useTableOperate } from '@/hooks/common/table';
+import { addDateRange } from '@/utils/common';
 import ButtonIcon from '../../../components/custom/button-icon.vue';
 import TableSearch from './module/table-search.vue';
 import TablePreview from './module/table-preview.vue';
@@ -29,8 +30,8 @@ const { columns, columnChecks, data, getData, loading, mobilePagination, searchP
     size: 10,
     // if you want to use the searchParams in Form, you need to define the following properties, and the value is null
     // the value can not be undefined, otherwise the property in Form will not be reactive
-    tableName: '',
-    tableComment: '',
+    tableName: null,
+    tableComment: null,
     dateRange: null
   },
   columns: () => [
@@ -196,11 +197,16 @@ const showImport = ref<boolean>(false);
 function importTable() {
   showImport.value = true;
 }
+
+function handleSearch() {
+  const customQueryParams = addDateRange(searchParams, searchParams.dateRange);
+  getData(customQueryParams);
+}
 </script>
 
 <template>
   <div class="flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <TableSearch v-model:model="searchParams" :has-add="false" @reset="resetSearchParams" @search="getData" />
+    <TableSearch v-model:model="searchParams" :has-add="false" @reset="resetSearchParams" @search="handleSearch" />
     <NCard :bordered="false" size="small" class="sm:flex-1-hidden card-wrapper">
       <template #header>
         <NSpace class="lt-sm:w-200px" justify="start">

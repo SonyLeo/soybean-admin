@@ -2,11 +2,11 @@ import FileSaver from 'file-saver';
 import { request } from '../request';
 
 /** 获取代码生成列表 */
-export const fetchGenTableList = (data: Api.SystemManage.GenTableForm) => {
+export const fetchGenTableList = (params: Api.SystemManage.GenTableForm) => {
   return request<Api.SystemManage.GenTableList>({
     url: '/tool/gen/list',
     method: 'get',
-    data
+    params
   });
 };
 

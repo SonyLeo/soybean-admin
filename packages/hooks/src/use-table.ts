@@ -88,10 +88,10 @@ export default function useHookTable<A extends ApiFn, T, C>(config: TableConfig<
     }));
   }
 
-  async function getData() {
+  async function getData(customSearchParams?: any) {
     startLoading();
 
-    const formattedParams = formatSearchParams(searchParams);
+    const formattedParams = formatSearchParams(customSearchParams ?? searchParams);
 
     const response = await apiFn(formattedParams);
 
