@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { isNull } from 'lodash-es';
 import { useRouter } from 'vue-router';
-import { fetchGetGenTable } from '@/service/api';
+import { fetchGetGenTable, fetchUpdateGenTable } from '@/service/api';
 import BasicInfo from './module/info-basic.vue';
 import FieldInfo from './module/info-field.vue';
 import GenerateInfo from './module/info-generate.vue';
@@ -36,6 +36,14 @@ async function initGenData() {
   }
 }
 
+async function submit() {
+  await fetchUpdateGenTable(info.value);
+
+  initGenData();
+
+  window.$message?.success('更新成功');
+}
+
 initGenData();
 </script>
 
@@ -61,7 +69,7 @@ initGenData();
           {{ $t('common.back') }}
         </NButton>
 
-        <NButton ghost>
+        <NButton ghost @click="submit">
           <template #icon>
             <icon-material-symbols:input-circle-rounded class="text-icon" />
           </template>

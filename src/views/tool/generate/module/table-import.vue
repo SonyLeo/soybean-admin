@@ -53,12 +53,19 @@ const { columns, data, getData, loading, mobilePagination, searchParams, resetSe
 
 const { checkedRowKeys } = useTableOperate(data, getData);
 
+interface Emits {
+  /** Update genTable */
+  (e: 'update:genTable'): void;
+}
+const emit = defineEmits<Emits>();
+
 async function handelConfirm() {
   const tables = checkedRowKeys.value.join(',');
   const dataName = 'master';
   await fetchImportGenTable({ tables, dataName });
   showImport.value = false;
-  getData();
+
+  emit('update:genTable');
 }
 
 function reset() {

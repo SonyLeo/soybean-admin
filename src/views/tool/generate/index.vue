@@ -3,10 +3,18 @@ import { NButton, NPopconfirm } from 'naive-ui';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { isNull, isUndefined } from 'lodash-es';
-import { fetchDelUser, fetchDownloadCode, fetchDownloadCodeZip, fetchGenCode, fetchGenTableList } from '@/service/api';
+import {
+  fetchDelGenTable,
+  fetchDownloadCode,
+  fetchDownloadCodeZip,
+  fetchGenCode,
+  fetchGenTableList,
+  fetchSyncGenTable
+} from '@/service/api';
 import { $t } from '@/locales';
 import { useAppStore } from '@/store/modules/app';
 import { useTable, useTableOperate } from '@/hooks/common/table';
+import ButtonIcon from '../../../components/custom/button-icon.vue';
 import TableSearch from './module/table-search.vue';
 import TablePreview from './module/table-preview.vue';
 import TableImport from './module/table-import.vue';
@@ -30,12 +38,6 @@ const { columns, columnChecks, data, getData, loading, mobilePagination, searchP
       type: 'selection',
       align: 'center',
       width: 48
-    },
-    {
-      key: 'id',
-      title: '序号',
-      align: 'center',
-      width: 100
     },
     {
       key: 'dataName',
@@ -77,28 +79,47 @@ const { columns, columnChecks, data, getData, loading, mobilePagination, searchP
       key: 'operate',
       title: $t('common.operate'),
       align: 'center',
-      width: 130,
+      width: 200,
       render: row => (
         <div class="flex-center gap-8px">
-          <NButton type="primary" ghost size="small" onClick={() => preview(row.id)}>
-            预览
-          </NButton>
-          <NButton type="primary" ghost size="small" onClick={() => edit(row.id)}>
-            {$t('common.edit')}
-          </NButton>
+          <ButtonIcon tooltipContent="预览" tooltipPlacement="top">
+            <icon-icon-park-outline-preview-open class="text-21px color-#646cff" onClick={() => preview(row.id)} />
+          </ButtonIcon>
+          <ButtonIcon tooltipContent="编辑" tooltipPlacement="top">
+            <icon-icon-park-outline-edit-one class="text-21px color-#646cff" onClick={() => edit(row.id)} />
+          </ButtonIcon>
           <NPopconfirm onPositiveClick={() => handleDelete(row.id)}>
             {{
               default: () => $t('common.confirmDelete'),
               trigger: () => (
-                <NButton type="error" ghost size="small">
-                  {$t('common.delete')}
-                </NButton>
+                <div>
+                  <ButtonIcon tooltipContent="删除" tooltipPlacement="top">
+                    <icon-icon-park-outline-delete-five class="text-21px color-#f5222d" />
+                  </ButtonIcon>
+                </div>
               )
             }}
           </NPopconfirm>
-          <NButton type="primary" ghost size="small" onClick={() => download(row.id, row.genType)}>
-            {$t('common.download')}
-          </NButton>
+
+          <NPopconfirm onPositiveClick={() => handleAsync(row.id)}>
+            {{
+              default: () => '确认同步数据库结构吗',
+              trigger: () => (
+                <div>
+                  <ButtonIcon tooltipContent="数据库同步" tooltipPlacement="top">
+                    <icon-icon-park-outline-database-sync class="text-21px color-#646cff" />
+                  </ButtonIcon>
+                </div>
+              )
+            }}
+          </NPopconfirm>
+
+          <ButtonIcon tooltipContent="下载" tooltipPlacement="top">
+            <icon-icon-park-outline-code-download
+              class="text-21px color-#646cff"
+              onClick={() => download(row.id, row.genType)}
+            />
+          </ButtonIcon>
         </div>
       )
     }
@@ -115,16 +136,23 @@ const {
 
 async function handleBatchDelete() {
   if (checkedRowKeys.value.length > 0) {
-    await fetchDelUser(checkedRowKeys.value);
+    const tableIds = checkedRowKeys.value.join(',');
+    await fetchDelGenTable(tableIds);
 
     onBatchDeleted();
   }
 }
 
 async function handleDelete(id: number) {
-  await fetchDelUser(id);
+  await fetchDelGenTable(id);
 
   onDeleted();
+}
+
+async function handleAsync(id: number) {
+  await fetchSyncGenTable(id);
+
+  window.$message?.success('同步成功');
 }
 
 const genCodeList = ref<Record<string, string>>({});
@@ -206,7 +234,7 @@ function importTable() {
         :data="data"
         size="small"
         :flex-height="!appStore.isMobile"
-        :scroll-x="962"
+        :scroll-x="1200"
         :loading="loading"
         remote
         :row-key="row => row.id"
@@ -215,7 +243,7 @@ function importTable() {
       />
     </NCard>
     <TablePreview v-model="showPreview" :gen-code-list="genCodeList" />
-    <TableImport v-model="showImport" />
+    <TableImport v-model="showImport" @update:gen-table="getData" />
   </div>
 </template>
 
