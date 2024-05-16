@@ -54,6 +54,14 @@ declare namespace Api {
 
     /** datepicker */
     type Value = number | [number, number];
+
+    /**
+     * 生成方式
+     *
+     * - '0': 压缩包
+     * - '1': 自定义路径
+     */
+    type GenType = '0' | '1';
   }
 
   /**
@@ -156,7 +164,7 @@ declare namespace Api {
       businessName: string;
       functionName: string;
       functionAuthor: string;
-      genType: string;
+      genType: Common.GenType;
       genPath: string;
       pkColumn: any;
       columns: DbColumn[];
@@ -302,6 +310,12 @@ declare namespace Api {
     type GenTableForm = CommonType.RecordNullable<
       Pick<BackVO.GenTable, 'dataName' | 'tableName' | 'tableComment' | 'dateRange'> & CommonSearchParams
     >;
+
+    /** dbTable form */
+    type DBTableForm = Omit<GenTableForm, 'dateRange'>;
+
+    /** dbTable import */
+    type DBTableImport = { tables: string; dataName: string };
 
     /** genTable list */
     type GenTableList = Common.PaginatingQueryRecord<BackVO.GenTable>;

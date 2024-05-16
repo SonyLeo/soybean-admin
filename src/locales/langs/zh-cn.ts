@@ -25,6 +25,7 @@ const local: App.I18n.Schema = {
     logoutConfirm: '确认退出登录吗？',
     lookForward: '敬请期待',
     modify: '修改',
+    download: '下载',
     modifySuccess: '修改成功',
     noData: '无数据',
     operate: '操作',

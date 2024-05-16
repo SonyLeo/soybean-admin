@@ -2,13 +2,14 @@
 import { NButton, NPopconfirm } from 'naive-ui';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { isNull } from 'lodash-es';
-import { fetchDelUser, fetchGenCode, fetchGenTableList } from '@/service/api';
+import { isNull, isUndefined } from 'lodash-es';
+import { fetchDelUser, fetchDownloadCode, fetchDownloadCodeZip, fetchGenCode, fetchGenTableList } from '@/service/api';
 import { $t } from '@/locales';
 import { useAppStore } from '@/store/modules/app';
 import { useTable, useTableOperate } from '@/hooks/common/table';
 import TableSearch from './module/table-search.vue';
 import TablePreview from './module/table-preview.vue';
+import TableImport from './module/table-import.vue';
 
 const appStore = useAppStore();
 const router = useRouter();
@@ -95,6 +96,9 @@ const { columns, columnChecks, data, getData, loading, mobilePagination, searchP
               )
             }}
           </NPopconfirm>
+          <NButton type="primary" ghost size="small" onClick={() => download(row.id, row.genType)}>
+            {$t('common.download')}
+          </NButton>
         </div>
       )
     }
@@ -123,10 +127,6 @@ async function handleDelete(id: number) {
   onDeleted();
 }
 
-async function edit(id: number) {
-  router.push({ name: 'tool_generate-edit', params: { id } });
-}
-
 const genCodeList = ref<Record<string, string>>({});
 
 async function getGenCodeById(id: number) {
@@ -136,26 +136,53 @@ async function getGenCodeById(id: number) {
   }
 }
 
-const showModel = ref<boolean>(false);
+const showPreview = ref<boolean>(false);
 function preview(id: number) {
-  showModel.value = true;
+  showPreview.value = true;
   getGenCodeById(id);
+}
+
+async function edit(id: number) {
+  router.push({ name: 'tool_generate-edit', params: { id } });
+}
+
+async function download(id?: number, genType?: Api.Common.GenType) {
+  const tableIds = id || checkedRowKeys.value.join(',');
+  if (!isUndefined(id) && !isUndefined(genType)) {
+    if (genType === '1') {
+      await fetchDownloadCode(id);
+    } else {
+      fetchDownloadCodeZip(tableIds);
+    }
+    return;
+  }
+
+  if (checkedRowKeys.value.length === 0) {
+    window.$message?.warning?.('请选择要生成的数据');
+    return;
+  }
+  fetchDownloadCodeZip(tableIds);
+}
+
+const showImport = ref<boolean>(false);
+function importTable() {
+  showImport.value = true;
 }
 </script>
 
 <template>
-  <div class="min-h-1500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
+  <div class="flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <TableSearch v-model:model="searchParams" :has-add="false" @reset="resetSearchParams" @search="getData" />
     <NCard :bordered="false" size="small" class="sm:flex-1-hidden card-wrapper">
       <template #header>
         <NSpace class="lt-sm:w-200px" justify="start">
-          <NButton size="small" ghost type="tertiary">
+          <NButton size="small" ghost type="tertiary" @click="download()">
             <template #icon>
               <icon-fluent-mdl2:generate class="text-icon" />
             </template>
             生成
           </NButton>
-          <NButton size="small" ghost type="tertiary">
+          <NButton size="small" ghost type="tertiary" @click="importTable">
             <template #icon>
               <icon-iconoir:database-export class="text-icon" />
             </template>
@@ -187,7 +214,8 @@ function preview(id: number) {
         class="sm:h-full"
       />
     </NCard>
-    <TablePreview v-model="showModel" :gen-code-list="genCodeList" />
+    <TablePreview v-model="showPreview" :gen-code-list="genCodeList" />
+    <TableImport v-model="showImport" />
   </div>
 </template>
 

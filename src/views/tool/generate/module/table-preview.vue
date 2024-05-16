@@ -9,7 +9,7 @@ interface Props {
 defineOptions({ name: 'TablePreview' });
 defineProps<Props>();
 
-const showModel = defineModel({ type: Boolean });
+const showPreview = defineModel({ type: Boolean });
 const activeName = ref<string>('domain.java');
 
 function handleTabUpdate() {
@@ -26,7 +26,7 @@ function handleEnter() {
 <template>
   <div>
     <NModal
-      v-model:show="showModel"
+      v-model:show="showPreview"
       preset="card"
       class="w-1200px"
       title="代码预览"
