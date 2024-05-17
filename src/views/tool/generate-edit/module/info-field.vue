@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { h, ref, watchEffect } from 'vue';
-import type { type DataTableColumns, NCheckbox, NInput, NSelect, NSpace, SelectOption } from 'naive-ui';
+import type { DataTableColumns, SelectOption } from 'naive-ui';
+import { NCheckbox, NInput, NSelect, NSpace } from 'naive-ui';
 import { isNull } from 'lodash-es';
 import { useTimeout } from '@vueuse/core';
 import { fetchGetDictData } from '@/service/api';
