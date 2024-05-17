@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { h, ref, watchEffect } from 'vue';
-import { type DataTableColumns, NCheckbox, NInput, NSelect } from 'naive-ui';
+import type { type DataTableColumns, NCheckbox, NInput, NSelect, NSpace, SelectOption } from 'naive-ui';
 import { isNull } from 'lodash-es';
 import { useTimeout } from '@vueuse/core';
+import { fetchGetDictData } from '@/service/api';
 import { htmlTypeOptions, javaSelectOptions, queryTypeOptions } from '@/constants/business';
 
 const { ready, start } = useTimeout(500, { controls: true });
@@ -17,8 +18,23 @@ defineOptions({ name: 'FieldInfo' });
 
 const props = defineProps<Props>();
 const data = ref<Api.BackVO.DbColumn[]>([]);
+const DBDictOptions = ref<SelectOption[]>([]);
 
 type CheckedValue = '0' | '1';
+
+async function initDBDictOptions() {
+  const { data: DictData } = await fetchGetDictData();
+  if (DictData) {
+    DBDictOptions.value = DictData.map(item => {
+      return {
+        label: item.dictName,
+        value: item.dictType
+      };
+    });
+  }
+}
+
+initDBDictOptions();
 
 function createColumns(): DataTableColumns<Api.BackVO.DbColumn> {
   return [
@@ -174,16 +190,33 @@ function createColumns(): DataTableColumns<Api.BackVO.DbColumn> {
       }
     },
     {
-      key: 'columnType',
+      key: 'dictType',
       title: '字典类型',
       align: 'center',
-      width: '140',
+      width: '240',
       render: (row, index) => {
         return h(NSelect, {
-          options: htmlTypeOptions,
-          value: row.htmlType,
+          options: DBDictOptions.value,
+          value: row.dictType,
           onUpdateValue(v) {
-            data.value[index].htmlType = v;
+            data.value[index].dictType = v;
+          },
+          renderLabel: (option: CommonType.Option) => {
+            return h(
+              NSpace,
+              {
+                display: 'flex'
+              },
+              {
+                default: () => [
+                  h('div', option.label),
+                  h('div', { style: 'font-size: 11px; color: #999;' }, option.value)
+                ]
+              }
+            );
+          },
+          renderTag: ({ option }) => {
+            return option.label as string;
           }
         });
       }

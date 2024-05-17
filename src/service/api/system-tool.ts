@@ -100,3 +100,11 @@ export const fetchGetDataSourceName = () => {
     method: 'get'
   });
 };
+
+/** 获取数据字典数据 */
+export const fetchGetDictData = () => {
+  return request<Api.SystemManage.DBDictList>({
+    url: '/system/dict/type/optionselect',
+    method: 'get'
+  });
+};

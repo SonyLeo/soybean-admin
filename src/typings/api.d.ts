@@ -243,6 +243,15 @@ declare namespace Api {
       tree: boolean;
       crud: boolean;
     }>;
+
+    /** DBDict */
+    type DBDict = {
+      dictId: number;
+      dictName: string;
+      dictType: string;
+      remark: string;
+      createTime: string;
+    };
   }
 
   /**
@@ -325,6 +334,8 @@ declare namespace Api {
       rows: BackVO.DbColumn[];
       tables: BackVO.GenTable[];
     };
+
+    type DBDictList = Array<BackVO.DBDict>;
 
     /**
      * menu type
