@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import { NButton, NPopconfirm } from 'naive-ui';
+import type { SelectOption } from 'naive-ui';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { isNull, isUndefined } from 'lodash-es';
@@ -9,6 +10,7 @@ import {
   fetchDownloadCodeZip,
   fetchGenCode,
   fetchGenTableList,
+  fetchGetDataSourceName,
   fetchSyncGenTable
 } from '@/service/api';
 import { $t } from '@/locales';
@@ -30,7 +32,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination, searchP
     size: 10,
     // if you want to use the searchParams in Form, you need to define the following properties, and the value is null
     // the value can not be undefined, otherwise the property in Form will not be reactive
-    tableName: null,
+    tableName: '',
     tableComment: null,
     dateRange: null
   },
@@ -202,11 +204,31 @@ function handleSearch() {
   const customQueryParams = addDateRange(searchParams, searchParams.dateRange);
   getData(customQueryParams);
 }
+
+const dbNameList = ref<SelectOption[]>([]);
+
+async function initDBNameList() {
+  const { data: DBNameData } = await fetchGetDataSourceName();
+  if (DBNameData) {
+    dbNameList.value = DBNameData!.map(item => {
+      return { label: item, value: item };
+    });
+    dbNameList.value.unshift({ label: '全部', value: '' });
+  }
+}
+
+initDBNameList();
 </script>
 
 <template>
   <div class="flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <TableSearch v-model:model="searchParams" :has-add="false" @reset="resetSearchParams" @search="handleSearch" />
+    <TableSearch
+      v-model:model="searchParams"
+      :has-add="false"
+      :db-name-list="dbNameList"
+      @reset="resetSearchParams"
+      @search="handleSearch"
+    />
     <NCard :bordered="false" size="small" class="sm:flex-1-hidden card-wrapper">
       <template #header>
         <NSpace class="lt-sm:w-200px" justify="start">
@@ -249,7 +271,7 @@ function handleSearch() {
       />
     </NCard>
     <TablePreview v-model="showPreview" :gen-code-list="genCodeList" />
-    <TableImport v-model="showImport" @update:gen-table="getData" />
+    <TableImport v-model="showImport" :db-name-list="dbNameList" @update:gen-table="getData" />
   </div>
 </template>
 

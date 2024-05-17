@@ -92,3 +92,11 @@ export const fetchSyncGenTable = (tableId: string | number) => {
     method: 'get'
   });
 };
+
+/** 获取数据源名称 */
+export const fetchGetDataSourceName = () => {
+  return request<string[]>({
+    url: '/tool/gen/getDataNames',
+    method: 'get'
+  });
+};

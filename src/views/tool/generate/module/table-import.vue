@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import type { SelectOption } from 'naive-ui';
 import { fetchDBTableList, fetchImportGenTable } from '@/service/api';
 import { $t } from '@/locales';
 import { useTable, useTableOperate } from '@/hooks/common/table';
+
+defineProps<{
+  dbNameList: SelectOption[];
+}>();
 
 const showImport = defineModel({ type: Boolean });
 
@@ -13,9 +18,9 @@ const { columns, data, getData, loading, mobilePagination, searchParams, resetSe
     size: 5,
     // if you want to use the searchParams in Form, you need to define the following properties, and the value is null
     // the value can not be undefined, otherwise the property in Form will not be reactive
-    dataName: null,
-    tableName: '',
-    tableComment: ''
+    dataName: 'master',
+    tableName: null,
+    tableComment: null
   },
   columns: () => [
     {
@@ -85,16 +90,21 @@ onMounted(() => {
         <template #header>
           <NForm :model="searchParams" label-placement="left">
             <NGrid responsive="screen" item-responsive>
-              <NFormItemGi span="24 s:12 m:6" label="数据源" path="dataName">
-                <NInput v-model:value="searchParams.dataName" placeholder="请选择数据源" />
+              <NFormItemGi span="24 s:12 m:6" label="数据源" path="dataName" class="pr-24px">
+                <NSelect
+                  v-model:value="searchParams.dataName"
+                  clearable
+                  :options="dbNameList"
+                  placeholder="请选择数据源"
+                />
               </NFormItemGi>
               <NFormItemGi span="24 s:12 m:6" label="表名称" path="tableName" class="pr-24px">
-                <NInput v-model:value="searchParams.tableName" placeholder="请输入表名称" />
+                <NInput v-model:value="searchParams.tableName" clearable placeholder="请输入表名称" />
               </NFormItemGi>
               <NFormItemGi span="24 s:12 m:6" label="表描述" path="tableComment" class="pr-24px">
-                <NInput v-model:value="searchParams.tableComment" placeholder="请输入表描述" />
+                <NInput v-model:value="searchParams.tableComment" clearable placeholder="请输入表描述" />
               </NFormItemGi>
-              <NFormItemGi span="24 s:12 m:6" class="pr-24px">
+              <NFormItemGi span="24 s:12 m:6">
                 <NSpace class="w-full" justify="end">
                   <NButton @click="reset">
                     <template #icon>
@@ -103,7 +113,7 @@ onMounted(() => {
                     {{ $t('common.reset') }}
                   </NButton>
 
-                  <NButton type="primary" ghost @click="getData">
+                  <NButton type="primary" ghost @click="() => getData()">
                     <template #icon>
                       <icon-ic-round-search class="text-icon" />
                     </template>
