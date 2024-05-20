@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { isNull } from 'lodash-es';
-import { useRouter } from 'vue-router';
 import { fetchGetGenTable, fetchUpdateGenTable } from '@/service/api';
+import { useTabStore } from '@/store/modules/tab';
+import { useRouterPush } from '@/hooks/common/router';
 import BasicInfo from './module/info-basic.vue';
 import FieldInfo from './module/info-field.vue';
 import GenerateInfo from './module/info-generate.vue';
@@ -11,8 +12,10 @@ interface Props {
   id: string;
 }
 
+const tabStore = useTabStore();
 const props = defineProps<Props>();
-const router = useRouter();
+
+const { routerPushByKey } = useRouterPush();
 
 const activeName = ref('field');
 const basicInfoRef = ref<InstanceType<typeof BasicInfo> | null>(null);
@@ -33,11 +36,25 @@ async function initGenData() {
 }
 
 function handleBack() {
-  router.push({ name: 'tool_generate' });
+  routerPushByKey('tool_generate');
+  tabStore.removeActiveTab();
+  activeName.value = 'field';
 }
 
 async function submit() {
-  await fetchUpdateGenTable(Object.assign(info.value, { columns: fieldList.value }));
+  const genTable = Object.assign(info.value, { columns: fieldList.value });
+
+  /** 生成信息 */
+  const params = {
+    treeCode: info.value.treeCode,
+    treeName: info.value.treeName,
+    treeParentCode: info.value.treeParentCode,
+    parentMenuId: info.value.parentMenuId
+  };
+
+  genTable.params = params;
+
+  await fetchUpdateGenTable(genTable);
 
   initGenData();
 

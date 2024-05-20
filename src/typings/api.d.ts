@@ -232,6 +232,7 @@ declare namespace Api {
       genPath?: any;
       pkColumn?: any;
       columns: DbColumn[];
+      params: any;
       options?: any;
       remark?: any;
       treeCode?: any;
