@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import { h, ref, watchEffect } from 'vue';
+import { h, ref } from 'vue';
 import type { DataTableColumns, SelectOption } from 'naive-ui';
 import { NCheckbox, NInput, NSelect, NSpace } from 'naive-ui';
-import { isNull } from 'lodash-es';
 import { useTimeout } from '@vueuse/core';
 import { fetchGetDictData } from '@/service/api';
 import { htmlTypeOptions, javaSelectOptions, queryTypeOptions } from '@/constants/business';
+
+defineOptions({ name: 'FieldInfo' });
 
 const { ready, start } = useTimeout(500, { controls: true });
 
 start();
 
-interface Props {
-  fieldList: Api.BackVO.DbColumn[];
-}
+const data = defineModel<Api.BackVO.DbColumn[]>('fieldList', { required: true });
 
-defineOptions({ name: 'FieldInfo' });
-
-const props = defineProps<Props>();
-const data = ref<Api.BackVO.DbColumn[]>([]);
 const DBDictOptions = ref<SelectOption[]>([]);
 
 type CheckedValue = '0' | '1';
@@ -228,13 +223,6 @@ function createColumns(): DataTableColumns<Api.BackVO.DbColumn> {
 const columns = ref<DataTableColumns<Api.BackVO.DbColumn>>(createColumns());
 
 const tableHeight = ref<string>(`${document.documentElement.scrollHeight - 420}px`);
-
-watchEffect(() => {
-  const tempData = props.fieldList;
-  if (!isNull(tempData)) {
-    data.value = tempData;
-  }
-});
 </script>
 
 <template>

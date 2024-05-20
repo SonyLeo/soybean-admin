@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import type { SelectOption } from 'naive-ui';
+import { NSelect } from 'naive-ui';
+import { ref, watchEffect } from 'vue';
 import { genPathOptions, genTemplateOptions } from '@/constants/business';
+
 defineOptions({ name: 'GenerateInfo' });
 
-interface Props {
-  info: Partial<Api.BackVO.DbTable>;
-  tableData: Api.BackVO.DbTable[];
-}
-
-const props = defineProps<Props>();
-
-const model = computed(() => props.info);
+const model = defineModel<Partial<Api.BackVO.DbTable>>('info', { required: true, default: () => {} });
 
 function handleUpdateTplCategory(value: string) {
   if (value !== 'sub') {
@@ -22,6 +18,28 @@ function handleUpdateTplCategory(value: string) {
 function handleGenPathSelect(key: string) {
   model.value.genPath = key;
 }
+
+const table = defineModel<Api.BackVO.DbTable[]>('tableData', { required: true });
+const tableColumnOptions = ref<SelectOption[]>([]);
+
+function setSubTableColumns(value: string) {
+  table.value.forEach((item: Api.BackVO.DbTable) => {
+    const tableName = item.tableName;
+    if (tableName === value) {
+      tableColumnOptions.value = item.columns.map(column => ({
+        label: `${column.columnName}-->${column.columnComment}`,
+        value: column.columnName
+      }));
+    }
+  });
+}
+
+watchEffect(() => {
+  const tableName = model.value.tableName;
+  if (tableName) {
+    setSubTableColumns(tableName);
+  }
+});
 </script>
 
 <template>
@@ -82,7 +100,7 @@ function handleGenPathSelect(key: string) {
         <NForm :model="model" :rules="{}" label-placement="left" label-width="80">
           <NGrid responsive="screen" item-responsive>
             <NFormItemGi span="24 s:12 m:12" label-width="120" label="树编码字段" path="treeCode" class="pr-24px">
-              <NInput v-model:value="model.treeCode" placeholder="请选择" />
+              <NSelect v-model:value="model.treeCode" :options="tableColumnOptions" placeholder="请选择" />
             </NFormItemGi>
             <NFormItemGi
               span="24 s:12 m:12"
@@ -91,10 +109,10 @@ function handleGenPathSelect(key: string) {
               path="treeParentCode"
               class="pr-24px"
             >
-              <NInput v-model:value="model.treeParentCode" placeholder="请选择" />
+              <NSelect v-model:value="model.treeParentCode" :options="tableColumnOptions" placeholder="请选择" />
             </NFormItemGi>
             <NFormItemGi span="24 s:12 m:12" label-width="120" label="树名称字段" path="treeName" class="pr-24px">
-              <NInput v-model:value="model.treeName" class="w-full" />
+              <NSelect v-model:value="model.treeName" :options="tableColumnOptions" class="w-full" />
             </NFormItemGi>
           </NGrid>
         </NForm>

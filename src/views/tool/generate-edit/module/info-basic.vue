@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 defineOptions({ name: 'BasicInfo' });
 
-interface Props {
-  info: Partial<Api.BackVO.DbTable>;
-}
-
-const props = defineProps<Props>();
-
-const model = computed(() => props.info);
+const model = defineModel<Partial<Api.BackVO.DbTable>>({ required: true });
 
 const rules = ref({
   tableName: [{ required: true, message: '请输入表名称', trigger: 'blur' }],

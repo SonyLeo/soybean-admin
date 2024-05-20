@@ -332,7 +332,7 @@ declare namespace Api {
     type GenTableInfo = {
       info: BackVO.GenTable;
       rows: BackVO.DbColumn[];
-      tables: BackVO.GenTable[];
+      tables: BackVO.DbTable[];
     };
 
     type DBDictList = Array<BackVO.DBDict>;
