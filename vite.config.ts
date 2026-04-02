@@ -34,7 +34,7 @@ export default defineConfig(configEnv => {
     server: {
       host: '0.0.0.0',
       port: 9527,
-      open: true,
+      open: process.env.PLAYWRIGHT !== '1',
       proxy: createViteProxy(viteEnv, enableProxy)
     },
     preview: {
